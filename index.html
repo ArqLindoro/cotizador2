@@ -3,122 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Propuesta de Inversión | Arq. David Lindoro</title>
+    <title>Propuesta de Ejecución | Arq. David Lindoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
-        body { background-color: #111; font-family: 'Montserrat', sans-serif; color: #333; }
-        .lux-card { background: #fff; border-top: 8px solid #b8926a; position: relative; overflow: hidden; }
+        body { background-color: #0d0d0d; font-family: 'Montserrat', sans-serif; color: #333; }
+        .lux-card { background: #fff; border-top: 8px solid #b8926a; }
         .gold-text { color: #b8926a; }
-        h1, h2, h3 { font-family: 'Cinzel', serif; }
-        .bg-gold { background-color: #b8926a; }
-        .linea-decorativa { width: 50px; height: 2px; background: #b8926a; margin: 15px auto; }
+        h1, h2 { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
-        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
 
-    <div id="area-pdf" class="w-full max-w-3xl lux-card shadow-2xl p-8 md:p-16 transition-all">
+    <div id="area-pdf" class="w-full max-w-2xl lux-card shadow-2xl p-8 md:p-14 transition-all">
         
-        <header class="text-center mb-12">
-            <h1 class="text-3xl font-bold uppercase gold-text tracking-[0.3em]">David Lindoro</h1>
-            <p class="text-[10px] tracking-[0.5em] text-gray-400 uppercase mt-3 font-semibold">Arquitectura de Autor · Puebla</p>
-            <div class="linea-decorativa"></div>
-            <h2 class="text-[11px] uppercase tracking-[0.2em] text-gray-500 mt-4">Propuesta de Inversión Residencial 2026</h2>
+        <header class="text-center border-b pb-8 mb-10">
+            <h1 class="text-2xl font-bold uppercase gold-text tracking-[0.3em]">David Lindoro</h1>
+            <p class="text-[9px] tracking-[0.5em] text-gray-400 uppercase mt-2 font-semibold">Arquitectura de Autor · Puebla</p>
+            <div class="w-12 h-0.5 bg-[#b8926a] mx-auto mt-6"></div>
         </header>
 
-        <div id="pantalla-uno" class="max-w-sm mx-auto space-y-8 py-10">
+        <div id="pantalla-uno" class="max-w-xs mx-auto py-12 space-y-8">
             <div class="text-center">
-                <label class="block text-[10px] font-bold uppercase mb-4 tracking-widest text-gray-400">Superficie de Proyecto (m²):</label>
-                <input type="number" id="m2-input" placeholder="0.00" class="w-full p-4 border-b border-gray-100 outline-none text-4xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light">
+                <label class="block text-[10px] font-bold uppercase mb-4 tracking-widest text-gray-400 text-center">Metros Cuadrados de Construcción:</label>
+                <input type="number" id="m2-input" placeholder="0.00" class="w-full p-2 border-b border-gray-100 outline-none text-4xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light">
             </div>
-            <button onclick="generarPropuesta()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-[#b8926a] transition-all shadow-2xl">
-                Crear Propuesta de Interés
+            <button onclick="generar()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b8926a] transition-all">
+                Generar Propuesta de Obra
             </button>
         </div>
 
-        <div id="pantalla-dos" class="hidden animate-in fade-in duration-1000">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12" id="contenedor-items">
+        <div id="pantalla-dos" class="hidden animate-in fade-in duration-700">
+            <div class="grid grid-cols-1 gap-8 mb-12" id="lista-fases">
                 </div>
 
-            <div class="bg-zinc-50 p-10 mt-12 border border-gray-100 relative">
-                <div class="text-center space-y-4">
-                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em]">Inversión Total Estimada</p>
-                    <p id="res-total" class="text-5xl gold-text font-light tracking-tighter"></p>
-                    <p class="text-[9px] text-gray-400 italic max-w-xs mx-auto leading-relaxed">
-                        Incluye ejecución de obra, materiales premium, mano de obra especializada y honorarios de diseño de autor (20%).
-                    </p>
-                </div>
+            <div class="bg-zinc-900 p-10 text-center rounded-sm shadow-xl">
+                <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Inversión Total de Ejecución</p>
+                <p id="total-final" class="text-4xl gold-text font-light tracking-tighter"></p>
+                <p class="text-[8px] text-gray-500 uppercase mt-4 tracking-widest leading-relaxed">
+                    Honorarios profesionales del 20% integrados en el monto total.
+                </p>
             </div>
 
-            <div class="mt-12 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-10">
-                <p>Ubicación: Puebla, Pue. · Validez: 30 días</p>
-                <p class="font-bold text-gray-600">* No incluye: Licencias municipales, trámites de DRO, ni pagos de IMSS.</p>
+            <div class="mt-12 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-8">
+                <p class="mb-2">Vigencia: Marzo 2026 · Puebla, Pue.</p>
+                <p class="font-bold text-gray-600">NOTA: Esta cotización contempla exclusivamente el suministro de materiales y mano de obra especializada para la ejecución física.</p>
+                <p class="font-bold text-[#b8926a]">NO INCLUYE: GASTOS DE GESTIÓN, LICENCIAS DE CONSTRUCCIÓN, PAGO DE DERECHOS NI CUOTAS OBRERO-PATRONALES (IMSS).</p>
             </div>
 
-            <div class="mt-10 flex flex-col md:flex-row gap-4 no-print">
-                <button onclick="descargarPDF()" class="flex-1 bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Exportar Documento de Interés</button>
-                <button onclick="location.reload()" class="px-8 py-4 text-[9px] text-gray-400 font-bold border border-gray-200 uppercase tracking-widest">Nueva Propuesta</button>
+            <div class="mt-10 flex flex-col gap-3 no-print">
+                <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Descargar PDF Profesional</button>
+                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest">Nueva Propuesta</button>
             </div>
         </div>
     </div>
 
     <script>
-        const moneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        const moneda = (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
 
-        // Datos técnicos agrupados por "Interés"
-        const categorias = [
-            { t: "Fase Legal y Preliminar", desc: "Gestión de licencias, nivelación topográfica y preparación del sitio.", p: 770 },
-            { t: "Infraestructura Sólida", desc: "Cimentación profunda, muros reforzados y losas estructurales.", p: 4800 },
-            { t: "Sistemas Inteligentes", desc: "Instalaciones hidráulicas, sanitarias, eléctricas y cisterna de 10k Lts.", p: 2900 },
-            { t: "Envolvente y Acabados", desc: "Revestimientos porcelánicos, aplanados regleados e impermeabilización.", p: 3500 },
-            { t: "Carpintería y Confort", desc: "Cancelería serie europea, cocina de diseño y carpintería en encino.", p: 6800 },
-            { t: "Detalles y Entrega", desc: "Limpieza fina, retiro de escombro y entrega de llaves.", p: 450 }
+        // FASES PURAMENTE DE EJECUCIÓN (Sin gestiones)
+        const fases = [
+            { t: "Preliminares de Obra", d: "Limpieza del terreno, trazo, nivelación topográfica y resguardo provisional de materiales.", p: 550 },
+            { t: "Cimentación y Estructura", d: "Excavaciones, cimentación de piedra braza, muros de carga y losas estructurales.", p: 4800 },
+            { t: "Instalaciones de Ingeniería", d: "Redes hidráulicas, sanitarias, eléctricas y cisterna de concreto de 10,000 Lts.", p: 2900 },
+            { t: "Envolvente y Revestimientos", d: "Acabados en muros, pisos de gran formato, pintura e impermeabilización de azoteas.", p: 3500 },
+            { t: "Equipamiento de Lujo", d: "Cancelería serie europea, cocina integral con cuarzo y carpintería en madera de encino.", p: 6800 },
+            { t: "Cierre y Entrega Fina", d: "Limpieza profunda de obra y detallado para entrega de llaves al propietario.", p: 250 }
         ];
 
-        function generarPropuesta() {
-            const m2 = parseFloat(document.getElementById('m2-input').value);
-            if (!m2 || m2 <= 0) return alert("Por favor, indique los m2 del proyecto.");
+        function generar() {
+            const m = parseFloat(document.getElementById('m2-input').value);
+            if (!m || m <= 0) return alert("Ingrese los m2");
 
             let html = "";
             let subtotal = 0;
 
-            categorias.forEach(cat => {
-                let costoFase = m2 * cat.p;
-                subtotal += costoFase;
+            fases.forEach(f => {
+                let costo = m * f.p;
+                subtotal += costo;
                 html += `
-                    <div class="border-l-2 border-[#b8926a] pl-6 py-2">
-                        <h3 class="text-[12px] font-bold text-gray-800 uppercase tracking-widest mb-2">${cat.t}</h3>
-                        <p class="text-[10px] text-gray-500 leading-relaxed mb-3">${cat.desc}</p>
-                        <p class="text-sm font-semibold gold-text">${moneda.format(costoFase)}</p>
+                    <div class="flex justify-between items-start border-b border-gray-50 pb-4">
+                        <div class="max-w-[70%]">
+                            <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">${f.t}</h3>
+                            <p class="text-[9px] text-gray-400 leading-tight uppercase tracking-tighter">${f.d}</p>
+                        </div>
+                        <p class="text-sm font-semibold gold-text">${moneda(costo * 1.20)}</p>
                     </div>
                 `;
             });
 
-            // Aplicamos tu 20% de UTILIDAD sobre el costo de obra
-            const totalFinal = subtotal * 1.20;
-
-            document.getElementById('contenedor-items').innerHTML = html;
-            document.getElementById('res-total').innerText = moneda.format(totalFinal);
+            document.getElementById('lista-fases').innerHTML = html;
+            document.getElementById('total-final').innerText = moneda(subtotal * 1.20);
             
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
         }
 
-        function descargarPDF() {
-            const element = document.getElementById('area-pdf');
+        function exportar() {
+            const el = document.getElementById('area-pdf');
             const btns = document.querySelectorAll('.no-print');
             btns.forEach(b => b.style.display = 'none');
 
             html2pdf().set({
                 margin: 10,
-                filename: 'Cotizacion_Interes_Lindoro.pdf',
+                filename: 'Propuesta_Obra_Lindoro.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).from(element).save().then(() => {
+            }).from(el).save().then(() => {
                 btns.forEach(b => b.style.display = 'flex');
             });
         }
