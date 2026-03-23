@@ -3,128 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador Material y MO | Arq. David Lindoro</title>
+    <title>Cotizador Operativo | Arq. David Lindoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
-        body { background-color: #0f0f0f; font-family: 'Montserrat', sans-serif; }
-        .lux-card { background: #fff; border-top: 8px solid #b8926a; border-radius: 2px; }
+        body { background-color: #0d0d0d; font-family: 'Montserrat', sans-serif; }
+        .lux-card { background: #fff; border-top: 8px solid #b8926a; }
         .gold-text { color: #b8926a; }
         h1 { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
+<body class="p-4 md:p-10 flex justify-center items-start min-h-screen text-gray-800">
 
-    <div id="area-pdf" class="w-full max-w-xl lux-card shadow-2xl p-8 md:p-12">
+    <div id="area-pdf" class="w-full max-w-xl lux-card shadow-2xl p-8 md:p-12 transition-all">
         
         <header class="text-center border-b pb-6 mb-10">
             <h1 class="text-2xl font-bold uppercase gold-text tracking-widest">Arq. David Lindoro</h1>
             <p class="text-[10px] tracking-[0.4em] text-gray-400 uppercase mt-2">Arquitectura de Autor · Puebla</p>
         </header>
 
-        <!-- FORMULARIO -->
+        <!-- PANTALLA 1: ENTRADA -->
         <div id="pantalla-uno" class="space-y-8">
             <div>
-                <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400">Metros Cuadrados de Construcción:</label>
-                <input type="number" id="m2" placeholder="Ej: 180" class="w-full p-3 border-b-2 border-gray-100 outline-none text-2xl focus:border-[#b8926a] transition-all bg-transparent font-light">
+                <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400">Extensión de Obra (m²):</label>
+                <input type="number" id="in-m2" placeholder="0.00" class="w-full p-3 border-b-2 border-gray-100 outline-none text-2xl focus:border-[#b8926a] transition-all bg-transparent font-light text-gray-700">
             </div>
 
             <div>
-                <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400">Tipo de Proyecto (Costo m²):</label>
-                <select id="precio-base" class="w-full p-3 border-b-2 border-gray-100 bg-white outline-none cursor-pointer text-sm uppercase font-semibold">
-                    <option value="16500">Residencial Medio ($16,500/m²)</option>
-                    <option value="19800">Residencial Premium ($19,800/m²)</option>
-                    <option value="24500">Lujo de Autor ($24,500/m²)</option>
+                <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400">Nivel de Ejecución:</label>
+                <select id="in-precio" class="w-full p-3 border-b-2 border-gray-100 bg-white outline-none cursor-pointer text-sm uppercase font-semibold text-gray-600">
+                    <option value="19800">Residencial Premium (Puebla)</option>
+                    <option value="24500">Lujo de Autor (Puebla)</option>
                 </select>
             </div>
 
-            <button onclick="calcular()" class="w-full bg-[#b8926a] text-white py-5 font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-black transition-all shadow-xl">
-                Calcular Inversión Estimada
+            <button onclick="generarPropuesta()" class="w-full bg-[#b8926a] text-white py-5 font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-black transition-all shadow-lg">
+                Generar Desglose Operativo
             </button>
         </div>
 
-        <!-- RESULTADOS -->
-        <div id="pantalla-dos" class="hidden animate-in fade-in duration-700">
+        <!-- PANTALLA 2: RESULTADOS -->
+        <div id="pantalla-dos" class="hidden">
             <div class="space-y-8">
                 <div class="space-y-6">
-                    <div class="border-l-2 border-[#b8926a] pl-6">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Materiales y Suministros</p>
-                        <p id="out-mat" class="text-xl font-bold text-gray-800"></p>
-                        <p class="text-[9px] text-gray-400 italic mt-1">(Incluye fletes, desperdicios y utilidad prorrateada)</p>
+                    <div class="flex justify-between items-end border-b pb-4">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Suministro de Materiales</p>
+                            <p id="out-mat" class="text-lg font-semibold text-gray-800"></p>
+                        </div>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase mb-1">60% Inversión</span>
                     </div>
 
-                    <div class="border-l-2 border-[#b8926a] pl-6">
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Mano de Obra Calificada</p>
-                        <p id="out-mo" class="text-xl font-bold text-gray-800"></p>
-                        <p class="text-[9px] text-gray-400 italic mt-1">(Incluye supervisión técnica y utilidad prorrateada)</p>
+                    <div class="flex justify-between items-end border-b pb-4">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Mano de Obra Especializada</p>
+                            <p id="out-mo" class="text-lg font-semibold text-gray-800"></p>
+                        </div>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase mb-1">40% Inversión</span>
                     </div>
                 </div>
 
-                <div class="bg-zinc-900 p-10 text-center rounded-sm shadow-inner">
-                    <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Total de Inversión Obra</p>
+                <div class="bg-zinc-900 p-8 text-center rounded-sm">
+                    <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Monto Total de Ejecución</p>
                     <p id="out-total" class="text-4xl gold-text font-light tracking-tighter"></p>
                 </div>
 
-                <div class="text-[8px] text-gray-400 text-center space-y-2 uppercase tracking-widest leading-loose border-t pt-6">
-                    <p>* Los montos presentados ya incluyen el 20% de utilidad profesional del Arq. David Lindoro.</p>
-                    <p>Vigencia de precios: Marzo 2026 - Puebla, Pue.</p>
+                <div class="text-[8px] text-gray-400 text-center space-y-3 uppercase tracking-[0.2em] leading-relaxed border-t pt-8">
+                    <p>* Esta propuesta contempla exclusivamente insumos, materiales y personal de obra.</p>
+                    <p>** No incluye: Licencias de construcción, trámites ante dependencias, pagos de IMSS ni servicios externos.</p>
+                    <p class="text-gray-500 font-bold">La utilidad profesional del 20% se encuentra prorrateada en los montos anteriores.</p>
                 </div>
 
-                <div id="controles" class="flex flex-col gap-4 pt-4">
-                    <button onclick="descargarPDF()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Descargar PDF Profesional</button>
-                    <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest">Nueva Cotización</button>
+                <div id="botones-pdf" class="flex flex-col gap-4 pt-4">
+                    <button onclick="exportarPDF()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Exportar Propuesta PDF</button>
+                    <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest">Nueva Estimación</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function calcular() {
-            const m = parseFloat(document.getElementById('m2').value);
-            const p = parseFloat(document.getElementById('precio-base').value);
+        function generarPropuesta() {
+            const m2 = parseFloat(document.getElementById('in-m2').value);
+            const precioBase = parseFloat(document.getElementById('in-precio').value);
 
-            if (!m || m <= 0) {
-                alert("Por favor ingrese los metros cuadrados.");
+            if (!m2 || m2 <= 0) {
+                alert("Por favor, ingrese el metraje de la construcción.");
                 return;
             }
 
-            // TOTAL CON UTILIDAD (El precio base ya debería considerar tu margen, 
-            // pero aquí le sumamos el 20% de utilidad sobre el costo bruto si el precio fuera "costo directo")
-            // Si el precio de los options ya es tu "precio de venta", quita el * 1.20
-            const totalVenta = (m * p) * 1.20; 
+            // LÓGICA DE NEGOCIO:
+            // 1. Calculamos el costo base
+            // 2. Sumamos tu 20% de utilidad directamente al total (prorrateo)
+            const totalConUtilidad = (m2 * precioBase) * 1.20;
 
-            // PRORRATEO: 60% Material / 40% Mano de Obra
-            const matVisual = totalVenta * 0.60;
-            const moVisual = totalVenta * 0.40;
+            // 3. Dividimos en proporción operativa (60% mat / 40% mo)
+            const costoMat = totalConUtilidad * 0.60;
+            const costoMO = totalConUtilidad * 0.40;
 
-            const moneda = (v) => new Intl.NumberFormat('es-MX', { 
-                style: 'currency', currency: 'MXN' 
-            }).format(v);
+            const formato = new Intl.NumberFormat('es-MX', {
+                style: 'currency', currency: 'MXN'
+            });
 
-            document.getElementById('out-mat').innerText = moneda(matVisual);
-            document.getElementById('out-mo').innerText = moneda(moVisual);
-            document.getElementById('out-total').innerText = moneda(totalVenta);
+            document.getElementById('out-mat').innerText = formato.format(costoMat);
+            document.getElementById('out-mo').innerText = formato.format(costoMO);
+            document.getElementById('out-total').innerText = formato.format(totalConUtilidad);
 
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
         }
 
-        function descargarPDF() {
-            const element = document.getElementById('area-pdf');
-            const btns = document.getElementById('controles');
+        function exportarPDF() {
+            const area = document.getElementById('area-pdf');
+            const btns = document.getElementById('botones-pdf');
             btns.style.display = 'none';
 
-            const opt = {
+            const opciones = {
                 margin: 10,
-                filename: 'Propuesta_Arquitectonica_Lindoro.pdf',
+                filename: 'Propuesta_Ejecucion_Lindoro.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
+            html2pdf().set(opciones).from(area).save().then(() => {
                 btns.style.display = 'flex';
             });
         }
