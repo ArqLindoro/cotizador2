@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto Técnico | Arq. David Lindoro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
+        body { background-color: #111; font-family: 'Montserrat', sans-serif; }
+        .lux-card { background: #fff; border-top: 8px solid #b8926a; }
+        .gold-text { color: #b8926a; }
+        h1 { font-family: 'Cinzel', serif; }
+        th { background: #f8f8f8; color: #b8926a; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-table { width: 100%; border: none; padding: 8px; font-size: 12px; outline: none; }
+        .input-table:focus { background: #fffcf5; border-bottom: 1px solid #b8926a; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
+
+    <div id="area-pdf" class="w-full max-w-4xl lux-card shadow-2xl p-8 md:p-12">
+        
+        <header class="flex justify-between items-center border-b pb-6 mb-8">
+            <div>
+                <h1 class="text-xl font-bold uppercase gold-text tracking-widest">Arq. David Lindoro</h1>
+                <p class="text-[9px] tracking-[0.3em] text-gray-400 uppercase mt-1">Presupuesto Técnico Detallado</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] text-gray-400 uppercase">Puebla, Pue. 2026</p>
+                <p id="fecha-actual" class="text-[10px] font-bold"></p>
+            </div>
+        </header>
+
+        <!-- TABLA DE CONCEPTOS -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b">
+                        <th class="p-3 w-1/2">Descripción del Concepto</th>
+                        <th class="p-3">Unidad</th>
+                        <th class="p-3">Cant.</th>
+                        <th class="p-3">Costo Base*</th>
+                        <th class="p-3 text-right">Importe (c/ Util)</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-cuerpo">
+                    <!-- Fila inicial -->
+                    <tr class="border-b border-gray-50">
+                        <td><input type="text" placeholder="Ej: Muro de Novablock..." class="input-table desc"></td>
+                        <td><input type="text" placeholder="m2" class="input-table uni text-center"></td>
+                        <td><input type="number" value="1" class="input-table cant text-center" oninput="calcularFila(this)"></td>
+                        <td><input type="number" placeholder="0.00" class="input-table costo text-center" oninput="calcularFila(this)"></td>
+                        <td class="p-3 text-right font-bold text-sm importe-final">$0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="agregarFila()" class="no-print mt-4 text-[10px] font-bold text-[#b8926a] uppercase tracking-widest hover:text-black transition-all">
+            + Añadir Concepto
+        </button>
+
+        <!-- TOTALES -->
+        <div class="mt-10 pt-6 border-t flex justify-end">
+            <div class="w-64 space-y-2">
+                <div class="flex justify-between text-xs text-gray-400 uppercase tracking-widest">
+                    <span>Subtotal Obra:</span>
+                    <span id="subtotal-final">$0.00</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold border-t pt-2">
+                    <span class="gold-text">TOTAL:</span>
+                    <span id="total-final">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12">
+            <p class="text-[8px] text-gray-400 italic leading-relaxed uppercase tracking-widest text-center">
+                * Los importes mostrados ya incluyen materiales, mano de obra y el 20% de indirectos y utilidad profesional.
+            </p>
+            
+            <div id="area-botones" class="mt-8 flex gap-4 no-print">
+                <button onclick="descargarPDF()" class="flex-1 bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">
+                    Exportar PDF Profesional
+                </button>
+                <button onclick="window.location.reload()" class="px-6 border border-gray-200 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50">
+                    Limpiar
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Poner fecha de hoy
+        document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        function agregarFila() {
+            const tbody = document.getElementById('tabla-cuerpo');
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-gray-50';
+            tr.innerHTML = `
+                <td><input type="text" class="input-table desc"></td>
+                <td><input type="text" class="input-table uni text-center"></td>
+                <td><input type="number" value="1" class="input-table cant text-center" oninput="calcularFila(this)"></td>
+                <td><input type="number" placeholder="0.00" class="input-table costo text-center" oninput="calcularFila(this)"></td>
+                <td class="p-3 text-right font-bold text-sm importe-final">$0.00</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function calcularFila(input) {
+            const fila = input.closest('tr');
+            const cant = parseFloat(fila.querySelector('.cant').value) || 0;
+            const costo = parseFloat(fila.querySelector('.costo').value) || 0;
+            
+            // FÓRMULA MÁGICA: Costo * Cantidad * 1.20 (Tu 20% de utilidad)
+            const importeConUtilidad = (cant * costo) * 1.20;
+            
+            const formato = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+            fila.querySelector('.importe-final').innerText = formato.format(importeConUtilidad);
+            
+            actualizarGranTotal();
+        }
+
+        function actualizarGranTotal() {
+            let total = 0;
+            document.querySelectorAll('.importe-final').forEach(celda => {
+                const valor = parseFloat(celda.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+                total += valor;
+            });
+
+            const formato = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+            document.getElementById('subtotal-final').innerText = formato.format(total);
+            document.getElementById('total-final').innerText = formato.format(total);
+        }
+
+        function descargarPDF() {
+            const element = document.getElementById('area-pdf');
+            const btns = document.getElementById('area-botones');
+            btns.style.display = 'none';
+
+            const opt = {
+                margin: 10,
+                filename: 'Presupuesto_Lindoro_Tecnico.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btns.style.display = 'flex';
+            });
+        }
+    </script>
+</body>
+</html>
