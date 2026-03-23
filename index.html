@@ -3,167 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presupuesto Maestro | Arq. David Lindoro</title>
+    <title>Propuesta de Inversión | Arq. David Lindoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
-        body { background-color: #0a0a0a; font-family: 'Montserrat', sans-serif; color: #333; }
-        .lux-card { background: #fff; border-top: 8px solid #b8926a; }
+        body { background-color: #111; font-family: 'Montserrat', sans-serif; color: #333; }
+        .lux-card { background: #fff; border-top: 8px solid #b8926a; position: relative; overflow: hidden; }
         .gold-text { color: #b8926a; }
-        h1, h2 { font-family: 'Cinzel', serif; }
-        th { background: #f9f9f9; color: #b8926a; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 10px; }
-        td { padding: 8px 10px; font-size: 11px; border-bottom: 1px solid #f0f0f0; }
+        h1, h2, h3 { font-family: 'Cinzel', serif; }
+        .bg-gold { background-color: #b8926a; }
+        .linea-decorativa { width: 50px; height: 2px; background: #b8926a; margin: 15px auto; }
         .hidden { display: none !important; }
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
 
-    <div id="area-pdf" class="w-full max-w-4xl lux-card shadow-2xl p-6 md:p-12 transition-all">
+    <div id="area-pdf" class="w-full max-w-3xl lux-card shadow-2xl p-8 md:p-16 transition-all">
         
-        <header class="text-center border-b pb-6 mb-8">
-            <h1 class="text-2xl font-bold uppercase gold-text tracking-widest">Arq. David Lindoro</h1>
-            <p class="text-[10px] tracking-[0.4em] text-gray-400 uppercase mt-2">Arquitectura de Autor · Presupuesto de Obra 2026</p>
+        <header class="text-center mb-12">
+            <h1 class="text-3xl font-bold uppercase gold-text tracking-[0.3em]">David Lindoro</h1>
+            <p class="text-[10px] tracking-[0.5em] text-gray-400 uppercase mt-3 font-semibold">Arquitectura de Autor · Puebla</p>
+            <div class="linea-decorativa"></div>
+            <h2 class="text-[11px] uppercase tracking-[0.2em] text-gray-500 mt-4">Propuesta de Inversión Residencial 2026</h2>
         </header>
 
-        <div id="pantalla-uno" class="max-w-md mx-auto py-10 space-y-6">
-            <div class="text-center mb-8">
-                <p class="text-xs text-gray-400 uppercase tracking-widest">Ingrese la superficie total a construir</p>
+        <div id="pantalla-uno" class="max-w-sm mx-auto space-y-8 py-10">
+            <div class="text-center">
+                <label class="block text-[10px] font-bold uppercase mb-4 tracking-widest text-gray-400">Superficie de Proyecto (m²):</label>
+                <input type="number" id="m2-input" placeholder="0.00" class="w-full p-4 border-b border-gray-100 outline-none text-4xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light">
             </div>
-            <input type="number" id="m2-input" placeholder="m² Totales (Ej: 200)" class="w-full p-4 border-b-2 border-gray-100 outline-none text-3xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light">
-            <button onclick="calcularPresupuesto()" class="w-full bg-[#b8926a] text-white py-5 font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-black transition-all">Generar Presupuesto Integral</button>
+            <button onclick="generarPropuesta()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-[#b8926a] transition-all shadow-2xl">
+                Crear Propuesta de Interés
+            </button>
         </div>
 
-        <div id="pantalla-dos" class="hidden">
-            <div id="contenedor-tablas">
+        <div id="pantalla-dos" class="hidden animate-in fade-in duration-1000">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12" id="contenedor-items">
                 </div>
 
-            <div class="mt-10 border-t-2 border-black pt-6 bg-gray-50 p-6">
-                <div class="flex justify-between items-center mb-2 text-xs uppercase tracking-widest text-gray-500">
-                    <span>Subtotal Costo de Obra:</span>
-                    <span id="res-subtotal"></span>
-                </div>
-                <div class="flex justify-between items-center mb-4 text-xs uppercase tracking-widest gold-text font-bold">
-                    <span>Honorarios Arq. David Lindoro (20%):</span>
-                    <span id="res-utilidad"></span>
-                </div>
-                <div class="flex justify-between items-center pt-4 border-t border-gray-200">
-                    <span class="text-lg font-bold uppercase tracking-tighter">Inversión Total Estimada:</span>
-                    <span id="res-total" class="text-2xl font-bold gold-text"></span>
+            <div class="bg-zinc-50 p-10 mt-12 border border-gray-100 relative">
+                <div class="text-center space-y-4">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em]">Inversión Total Estimada</p>
+                    <p id="res-total" class="text-5xl gold-text font-light tracking-tighter"></p>
+                    <p class="text-[9px] text-gray-400 italic max-w-xs mx-auto leading-relaxed">
+                        Incluye ejecución de obra, materiales premium, mano de obra especializada y honorarios de diseño de autor (20%).
+                    </p>
                 </div>
             </div>
 
-            <footer class="mt-8 text-[8px] text-gray-400 uppercase text-center tracking-widest leading-loose">
-                * Precios sujetos a cambio sin previo aviso. Incluye materiales, mano de obra y equipo especializado.<br>
-                Ubicación del Proyecto: Puebla, Pue.
-            </footer>
+            <div class="mt-12 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-10">
+                <p>Ubicación: Puebla, Pue. · Validez: 30 días</p>
+                <p class="font-bold text-gray-600">* No incluye: Licencias municipales, trámites de DRO, ni pagos de IMSS.</p>
+            </div>
 
-            <div class="mt-8 flex gap-4 no-print">
-                <button onclick="exportarPDF()" class="flex-1 bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest">Descargar Documento PDF</button>
-                <button onclick="location.reload()" class="px-6 text-[10px] text-gray-400 font-bold border border-gray-200 uppercase">Reiniciar</button>
+            <div class="mt-10 flex flex-col md:flex-row gap-4 no-print">
+                <button onclick="descargarPDF()" class="flex-1 bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Exportar Documento de Interés</button>
+                <button onclick="location.reload()" class="px-8 py-4 text-[9px] text-gray-400 font-bold border border-gray-200 uppercase tracking-widest">Nueva Propuesta</button>
             </div>
         </div>
     </div>
 
     <script>
-        const formato = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        const moneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
-        const capitulos = [
-            {
-                titulo: "I. Preliminares y Trámites",
-                items: [
-                    { c: "Licencias y Permisos", u: "m2", p: 215, factor: 1 },
-                    { c: "Limpieza y Despalme", u: "m2", p: 58.5, factor: 1 },
-                    { c: "Trazo y Nivelación", u: "m2", p: 48, factor: 1 },
-                    { c: "Tapial y Bodega", u: "m", p: 450, factor: 0.15 } // Estimado lineal
-                ]
-            },
-            {
-                titulo: "II. Cimentación y Estructura",
-                items: [
-                    { c: "Excavación Manual/Mecánica", u: "m3", p: 285, factor: 0.8 },
-                    { c: "Cimentación Piedra de Brasa", u: "m3", p: 2380, factor: 0.4 },
-                    { c: "Impermeabilización a Cadena", u: "m", p: 115, factor: 0.6 },
-                    { c: "Muros Block Pesado", u: "m2", p: 545, factor: 2.2 }, // Factor de muros por m2 construido
-                    { c: "Castillos y Columnas", u: "m", p: 415, factor: 1.8 },
-                    { c: "Losa Vigueta y Bovedilla", u: "m2", p: 1320, factor: 1 }
-                ]
-            },
-            {
-                titulo: "III. Instalaciones Integrales",
-                items: [
-                    { c: "Salida Hidráulica", u: "pza", p: 2480, factor: 0.08 },
-                    { c: "Salida Sanitaria", u: "pza", p: 2350, factor: 0.06 },
-                    { c: "Salida Eléctrica", u: "pza", p: 1180, factor: 0.25 },
-                    { c: "Cisterna Concreto 10,000L", u: "pza", p: 42000, factor: 0.005 }
-                ]
-            },
-            {
-                titulo: "IV. Acabados y Revestimientos",
-                items: [
-                    { c: "Aplanado Yeso/Mezcla", u: "m2", p: 235, factor: 3.5 },
-                    { c: "Piso Porcelanato Gran Formato", u: "m2", p: 1890, factor: 0.9 },
-                    { c: "Pintura Vinílica Premium", u: "m2", p: 145, factor: 4 },
-                    { c: "Impermeabilización Azotea", u: "m2", p: 240, factor: 0.6 }
-                ]
-            }
+        // Datos técnicos agrupados por "Interés"
+        const categorias = [
+            { t: "Fase Legal y Preliminar", desc: "Gestión de licencias, nivelación topográfica y preparación del sitio.", p: 770 },
+            { t: "Infraestructura Sólida", desc: "Cimentación profunda, muros reforzados y losas estructurales.", p: 4800 },
+            { t: "Sistemas Inteligentes", desc: "Instalaciones hidráulicas, sanitarias, eléctricas y cisterna de 10k Lts.", p: 2900 },
+            { t: "Envolvente y Acabados", desc: "Revestimientos porcelánicos, aplanados regleados e impermeabilización.", p: 3500 },
+            { t: "Carpintería y Confort", desc: "Cancelería serie europea, cocina de diseño y carpintería en encino.", p: 6800 },
+            { t: "Detalles y Entrega", desc: "Limpieza fina, retiro de escombro y entrega de llaves.", p: 450 }
         ];
 
-        function calcularPresupuesto() {
+        function generarPropuesta() {
             const m2 = parseFloat(document.getElementById('m2-input').value);
-            if (!m2) return alert("Ingrese m2");
+            if (!m2 || m2 <= 0) return alert("Por favor, indique los m2 del proyecto.");
 
             let html = "";
-            let subtotalObra = 0;
+            let subtotal = 0;
 
-            capitulos.forEach(cap => {
-                html += `<div class="mb-8">
-                    <h2 class="text-[12px] font-bold gold-text border-b mb-3 uppercase tracking-widest">${cap.titulo}</h2>
-                    <table class="w-full text-left">
-                        <thead><tr><th>Concepto</th><th>Unidad</th><th>Cant.</th><th>P.U.</th><th class="text-right">Importe</th></tr></thead>
-                        <tbody>`;
-                
-                cap.items.forEach(item => {
-                    let cant = (m2 * item.factor).toFixed(2);
-                    if(item.u === "pza" && cant < 1) cant = 1; // Mínimo 1 pieza
-                    let importe = cant * item.p;
-                    subtotalObra += importe;
-                    
-                    html += `<tr>
-                        <td class="w-2/5 font-semibold">${item.c}</td>
-                        <td class="text-gray-400 uppercase">${item.u}</td>
-                        <td>${Math.ceil(cant)}</td>
-                        <td>${formato.format(item.p)}</td>
-                        <td class="text-right font-bold">${formato.format(importe)}</td>
-                    </tr>`;
-                });
-                html += `</tbody></table></div>`;
+            categorias.forEach(cat => {
+                let costoFase = m2 * cat.p;
+                subtotal += costoFase;
+                html += `
+                    <div class="border-l-2 border-[#b8926a] pl-6 py-2">
+                        <h3 class="text-[12px] font-bold text-gray-800 uppercase tracking-widest mb-2">${cat.t}</h3>
+                        <p class="text-[10px] text-gray-500 leading-relaxed mb-3">${cat.desc}</p>
+                        <p class="text-sm font-semibold gold-text">${moneda.format(costoFase)}</p>
+                    </div>
+                `;
             });
 
-            document.getElementById('contenedor-tablas').innerHTML = html;
+            // Aplicamos tu 20% de UTILIDAD sobre el costo de obra
+            const totalFinal = subtotal * 1.20;
+
+            document.getElementById('contenedor-items').innerHTML = html;
+            document.getElementById('res-total').innerText = moneda.format(totalFinal);
             
-            // CÁLCULO DE UTILIDAD 20%
-            const utilidad = subtotalObra * 0.20;
-            const total = subtotalObra + utilidad;
-
-            document.getElementById('res-subtotal').innerText = formato.format(subtotalObra);
-            document.getElementById('res-utilidad').innerText = formato.format(utilidad);
-            document.getElementById('res-total').innerText = formato.format(total);
-
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
         }
 
-        function exportarPDF() {
+        function descargarPDF() {
             const element = document.getElementById('area-pdf');
             const btns = document.querySelectorAll('.no-print');
             btns.forEach(b => b.style.display = 'none');
 
             html2pdf().set({
-                margin: 5,
-                filename: 'Presupuesto_David_Lindoro.pdf',
+                margin: 10,
+                filename: 'Cotizacion_Interes_Lindoro.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                html2canvas: { scale: 3 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).from(element).save().then(() => {
                 btns.forEach(b => b.style.display = 'flex');
