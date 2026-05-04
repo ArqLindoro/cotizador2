@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador Semi Residencial | Arq. David Lindoro</title>
-    <!-- Tailwind para el diseño responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Biblioteca para generar el PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
@@ -28,15 +26,9 @@
         }
 
         .gold-text { color: var(--gold-primary); }
-        
         h1, h2 { font-family: 'Cinzel', serif; }
-
-        /* Estilo para ocultar elementos en el PDF */
-        .no-print { display: block; }
-        
         .hidden { display: none !important; }
 
-        /* Animación suave para cambios de pantalla */
         .fade-in {
             animation: fadeIn 0.6s ease-in;
         }
@@ -51,14 +43,12 @@
 
     <div id="area-pdf" class="w-full max-w-2xl lux-card shadow-2xl p-8 md:p-14 transition-all fade-in">
         
-        <!-- Encabezado Profesional -->
         <header class="text-center border-b pb-8 mb-10">
             <h1 class="text-2xl font-bold uppercase gold-text tracking-[0.3em]">David Lindoro</h1>
             <p class="text-[9px] tracking-[0.5em] text-gray-400 uppercase mt-2 font-semibold">Arquitectura de Autor · Puebla</p>
             <div class="w-12 h-0.5 bg-[#b8926a] mx-auto mt-6"></div>
         </header>
 
-        <!-- Pantalla de Entrada de Datos -->
         <div id="pantalla-uno" class="max-w-xs mx-auto py-12 space-y-8">
             <div class="text-center">
                 <p class="text-[10px] font-bold text-[#b8926a] uppercase tracking-[0.2em] mb-2">Estándar Semi Residencial</p>
@@ -70,35 +60,32 @@
             </button>
         </div>
 
-        <!-- Pantalla de Resultados (Cotización) -->
         <div id="pantalla-dos" class="hidden fade-in">
             <div class="mb-6 flex justify-between items-center border-b pb-2">
-                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Desglose de Ejecución</span>
+                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Alcance de la Partida</span>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-[#b8926a]">Calidad: Semi Residencial</span>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 mb-10" id="lista-fases">
+            <!-- Listado sin costos individuales -->
+            <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases">
                 <!-- Se llena con JS -->
             </div>
 
-            <!-- Resumen de Inversión -->
-            <div class="bg-zinc-900 p-8 text-center rounded-sm">
-                <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Inversión Total Estimada</p>
+            <div class="bg-zinc-900 p-8 text-center rounded-sm shadow-xl">
+                <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Inversión Total de Ejecución</p>
                 <p id="total-final" class="text-4xl gold-text font-light tracking-tighter"></p>
                 <p class="text-[8px] text-zinc-500 uppercase mt-4 tracking-widest leading-relaxed">
-                    Costo paramétrico: $12,500.00 MXN / m² <br>
+                    Costo integral: $12,500.00 MXN / m² <br>
                     Incluye honorarios profesionales (20%).
                 </p>
             </div>
 
-            <!-- Notas Legales -->
             <div class="mt-10 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-8">
-                <p class="mb-2">Vigencia: Marzo 2026 · Puebla, México</p>
-                <p class="font-bold text-gray-600">Materiales seleccionados para estándar semi residencial y mano de obra calificada.</p>
+                <p class="mb-2">Vigencia: Mayo 2026 · Puebla, México</p>
+                <p class="font-bold text-gray-600">Materiales de gama media-alta y mano de obra calificada.</p>
                 <p class="font-bold text-[#b8926a]">EXCLUYE: TRAMITOLOGÍA, LICENCIAS, DERECHOS MUNICIPALES Y CUOTAS IMSS.</p>
             </div>
 
-            <!-- Botones de Acción (No salen en el PDF) -->
             <div class="mt-10 flex flex-col gap-3 no-print">
                 <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">
                     Descargar PDF Oficial
@@ -113,13 +100,12 @@
     <script>
         const moneda = (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
 
-        // Estructura de costos para sumar exactamente $12,500/m2 (10,416.67 base + 20% honorarios)
         const fases = [
             { t: "Preliminares y Cimentación", d: "Limpieza, trazo, excavación y cimentación estructural.", p: 2500 },
             { t: "Estructura de Obra Gris", d: "Muros de carga, vigas, columnas y losas reforzadas.", p: 3500 },
             { t: "Instalaciones y Drenajes", d: "Redes hidráulicas, eléctricas y sanitarias integrales.", p: 1800 },
-            { t: "Recubrimientos y Acabados", d: "Aplanados, pisos cerámicos y detalles en muros.", p: 1600 },
-            { t: "Carpintería y Herrería", d: "Puertas, closets y ventanería de aluminio estándar.", p: 1016.67 }
+            { t: "Recubrimientos y Acabados", d: "Aplanados, yeso, pisos cerámicos y detalles en muros.", p: 1600 },
+            { t: "Carpintería y Herrería", d: "Puertas de acceso e intercomunicación, y ventanería de aluminio estándar.", p: 1016.67 }
         ];
 
         function generar() {
@@ -130,16 +116,13 @@
             let subtotalBase = 0;
 
             fases.forEach(f => {
-                const costoFaseFinal = (m * f.p) * 1.20; // Costo por fase con el 20% de honorario
                 subtotalBase += (m * f.p);
                 
+                // Generamos solo el nombre y la descripción sin el precio lateral
                 html += `
-                    <div class="flex justify-between items-start border-b border-gray-50 pb-4">
-                        <div class="max-w-[70%]">
-                            <h3 class="text-[10px] font-bold text-gray-800 uppercase tracking-widest mb-1">${f.t}</h3>
-                            <p class="text-[9px] text-gray-400 leading-tight uppercase tracking-tighter">${f.d}</p>
-                        </div>
-                        <p class="text-sm font-semibold gold-text">${moneda(costoFaseFinal)}</p>
+                    <div class="border-b border-gray-50 pb-3">
+                        <h3 class="text-[10px] font-bold text-gray-800 uppercase tracking-widest mb-1">${f.t}</h3>
+                        <p class="text-[9px] text-gray-400 leading-tight uppercase tracking-tighter">${f.d}</p>
                     </div>
                 `;
             });
@@ -154,20 +137,17 @@
         function exportar() {
             const el = document.getElementById('area-pdf');
             const botones = document.querySelectorAll('.no-print');
-            
-            // Ocultar botones antes de capturar
             botones.forEach(b => b.classList.add('hidden'));
 
             const opciones = {
                 margin: 10,
-                filename: 'Propuesta_SemiResidencial_DavidLindoro.pdf',
+                filename: 'Propuesta_Ejecucion_Lindoro.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, letterRendering: true, useCORS: true },
+                html2canvas: { scale: 3, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opciones).from(el).save().then(() => {
-                // Volver a mostrar botones
                 botones.forEach(b => b.classList.remove('hidden'));
             });
         }
