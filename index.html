@@ -9,34 +9,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
         
-        :root {
-            --gold-primary: #b8926a;
-            --dark-bg: #0d0d0d;
-        }
-
-        body { 
-            background-color: var(--dark-bg); 
-            font-family: 'Montserrat', sans-serif; 
-            color: #333; 
-        }
-
-        .lux-card { 
-            background: #fff; 
-            border-top: 8px solid var(--gold-primary); 
-        }
-
+        :root { --gold-primary: #b8926a; --dark-bg: #0d0d0d; }
+        body { background-color: var(--dark-bg); font-family: 'Montserrat', sans-serif; color: #333; }
+        .lux-card { background: #fff; border-top: 8px solid var(--gold-primary); }
         .gold-text { color: var(--gold-primary); }
         h1, h2 { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-in;
+        .fade-in { animation: fadeIn 0.6s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        input { 
+            background: transparent; 
+            border-bottom: 1px solid #eee; 
+            outline: none; 
+            transition: all 0.3s;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        input:focus { border-bottom: 1px solid var(--gold-primary); }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
@@ -49,32 +37,38 @@
             <div class="w-12 h-0.5 bg-[#b8926a] mx-auto mt-6"></div>
         </header>
 
-        <div id="pantalla-uno" class="max-w-xs mx-auto py-12 space-y-8">
-            <div class="text-center">
-                <p class="text-[10px] font-bold text-[#b8926a] uppercase tracking-[0.2em] mb-2">Estándar Semi Residencial</p>
-                <label class="block text-[10px] font-bold uppercase mb-4 tracking-widest text-gray-400 text-center">Metros Cuadrados a Construir:</label>
-                <input type="number" id="m2-input" placeholder="0.00" class="w-full p-2 border-b border-gray-100 outline-none text-4xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light" step="0.01">
+        <!-- Pantalla de Captura -->
+        <div id="pantalla-uno" class="max-w-sm mx-auto py-8 space-y-10">
+            <div class="space-y-8">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400 text-center">M² de Construcción Cubierta:</label>
+                    <input type="number" id="m2-input" placeholder="0.00" class="w-full p-2 text-3xl text-center font-light" step="0.01">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400 text-center">M² de Roof Garden / Top (Área abierta):</label>
+                    <input type="number" id="roof-input" placeholder="0.00" class="w-full p-2 text-3xl text-center font-light" step="0.01">
+                </div>
             </div>
+
             <button onclick="generar()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b8926a] transition-all">
                 Calcular Propuesta Técnica
             </button>
         </div>
 
+        <!-- Pantalla de Resultados -->
         <div id="pantalla-dos" class="hidden fade-in">
             <div class="mb-6 flex justify-between items-center border-b pb-2">
-                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Alcance de la Partida</span>
+                <span id="resumen-m2" class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Desglose</span>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-[#b8926a]">Calidad: Semi Residencial</span>
             </div>
 
-            <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases">
-                <!-- Contenido dinámico -->
-            </div>
+            <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases"></div>
 
             <div class="bg-zinc-900 p-8 text-center rounded-sm shadow-xl">
                 <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Inversión Total de Ejecución</p>
                 <p id="total-final" class="text-4xl gold-text font-light tracking-tighter"></p>
                 <p class="text-[8px] text-zinc-500 uppercase mt-4 tracking-widest leading-relaxed">
-                    Costo integral: $12,500.00 MXN / m² <br>
                     Mano de obra y suministros incluidos.
                 </p>
             </div>
@@ -86,12 +80,8 @@
             </div>
 
             <div class="mt-10 flex flex-col gap-3 no-print">
-                <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">
-                    Descargar PDF Oficial
-                </button>
-                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">
-                    Realizar nuevo cálculo
-                </button>
+                <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Descargar PDF Oficial</button>
+                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">Realizar nuevo cálculo</button>
             </div>
         </div>
     </div>
@@ -108,12 +98,22 @@
         ];
 
         function generar() {
-            const m = parseFloat(document.getElementById('m2-input').value);
-            if (!m || m <= 0) return alert("Por favor, ingresa los metros cuadrados.");
+            const m2Construccion = parseFloat(document.getElementById('m2-input').value) || 0;
+            const m2Roof = parseFloat(document.getElementById('roof-input').value) || 0;
 
-            const costoFinalM2 = 12500;
+            if (m2Construccion <= 0 && m2Roof <= 0) return alert("Por favor, ingresa al menos una superficie.");
+
+            const costoM2Cubierto = 12500;
+            const costoM2Roof = 6250; // Mitad de precio
+
+            const totalInversion = (m2Construccion * costoM2Cubierto) + (m2Roof * costoM2Roof);
+            
+            // Texto de resumen
+            let resumen = `${m2Construccion}m² Cubiertos`;
+            if(m2Roof > 0) resumen += ` + ${m2Roof}m² Roof Garden`;
+            document.getElementById('resumen-m2').innerText = resumen;
+
             let html = "";
-
             fases.forEach(f => {
                 html += `
                     <div class="border-b border-gray-50 pb-3">
@@ -124,7 +124,7 @@
             });
 
             document.getElementById('lista-fases').innerHTML = html;
-            document.getElementById('total-final').innerText = moneda(m * costoFinalM2);
+            document.getElementById('total-final').innerText = moneda(totalInversion);
             
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
