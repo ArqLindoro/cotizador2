@@ -5,177 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador Profesional | Arq. David Lindoro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
         
-        :root { --gold: #b8926a; --dark: #0d0d0d; }
-        body { background-color: var(--dark); font-family: 'Montserrat', sans-serif; }
+        :root { --gold: #b8926a; }
+        body { background-color: #0d0d0d; font-family: 'Montserrat', sans-serif; }
         
-        /* Contenedor Principal */
         .lux-card { 
             background: #ffffff !important; 
-            border-top: 8px solid var(--gold);
-            min-height: 842px; /* Altura aproximada A4 */
+            border-top: 10px solid var(--gold);
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
         }
 
         .gold-text { color: var(--gold) !important; }
         h1 { font-family: 'Cinzel', serif; letter-spacing: 0.3em; }
         
-        /* Caja del Total - Optimizada para PDF */
         .total-box {
             background-color: #1a1a1a !important;
             color: #ffffff !important;
-            padding: 40px;
+            padding: 35px;
             text-align: center;
             border-radius: 4px;
-            margin-top: 20px;
-            -webkit-print-color-adjust: exact;
         }
 
         .hidden { display: none !important; }
-        
-        input { 
-            border-bottom: 2px solid #f3f4f6;
-            outline: none;
-            transition: all 0.3s;
-            text-align: center;
-        }
+        input { border-bottom: 2px solid #f3f4f6; outline: none; text-align: center; }
         input:focus { border-bottom: 2px solid var(--gold); }
-
-        /* Ajustes específicos para el motor de PDF */
-        .pdf-fix { color: #1a1a1a !important; }
-        .line-separator { border-bottom: 1px solid #eee; margin-bottom: 12px; padding-bottom: 12px; }
+        .line-separator { border-bottom: 1px solid #eee; margin-bottom: 15px; padding-bottom: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-10 flex justify-center items-start">
+<body class="p-4 md:p-10">
 
-    <div id="area-pdf" class="w-full max-w-2xl lux-card shadow-2xl p-10 md:p-16">
+    <!-- CONTENEDOR QUE SE CAPTURA -->
+    <div id="capture-area" class="lux-card shadow-2xl p-8 md:p-12">
         
-        <!-- Encabezado -->
-        <header class="text-center mb-12">
+        <header class="text-center mb-10">
             <h1 class="text-3xl font-bold gold-text uppercase">David Lindoro</h1>
-            <p class="text-[10px] tracking-[0.4em] text-gray-500 uppercase mt-3 font-semibold">Arquitectura de Autor · Puebla</p>
+            <p class="text-[10px] tracking-[0.4em] text-gray-500 uppercase mt-2 font-semibold">Arquitectura de Autor · Puebla</p>
             <div class="w-16 h-0.5 bg-[#b8926a] mx-auto mt-6"></div>
         </header>
 
-        <!-- Formulario de Entrada (No sale en PDF) -->
-        <div id="pantalla-uno" class="max-w-sm mx-auto space-y-10 py-10 no-print">
-            <div class="space-y-8">
+        <!-- Pantalla 1: Entrada de datos -->
+        <div id="pantalla-uno" class="space-y-8 py-6">
+            <div class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400 text-center">Superficie Cubierta (m²):</label>
-                    <input type="number" id="m2-input" class="w-full text-4xl font-light py-2" placeholder="0.00">
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400 text-center">Superficie Cubierta (m²):</label>
+                    <input type="number" id="m2-input" class="w-full text-3xl font-light py-2" placeholder="0.00">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase mb-3 tracking-widest text-gray-400 text-center">Superficie Roof Garden (m²):</label>
-                    <input type="number" id="roof-input" class="w-full text-4xl font-light py-2" placeholder="0.00">
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400 text-center">Superficie Roof Garden (m²):</label>
+                    <input type="number" id="roof-input" class="w-full text-3xl font-light py-2" placeholder="0.00">
                 </div>
             </div>
-            <button onclick="generarPresupuesto()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b8926a] transition-all shadow-lg">
-                Generar Documento Profesional
+            <button onclick="generar()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b8926a] transition-all">
+                Generar Propuesta Visual
             </button>
         </div>
 
-        <!-- Resultados (Lo que se exporta) -->
+        <!-- Pantalla 2: El Presupuesto Final -->
         <div id="pantalla-dos" class="hidden">
-            <div class="flex justify-between items-center border-b pb-3 mb-8">
-                <span id="label-detalle" class="text-[10px] font-bold uppercase tracking-widest text-gray-500"></span>
-                <span class="text-[10px] font-bold uppercase tracking-widest gold-text">Calidad: Semi Residencial</span>
+            <div class="flex justify-between items-center border-b pb-2 mb-6">
+                <span id="resumen-texto" class="text-[9px] font-bold uppercase tracking-widest text-gray-500"></span>
+                <span class="text-[9px] font-bold uppercase tracking-widest gold-text">Calidad: Semi Residencial</span>
             </div>
 
-            <div id="lista-fases" class="space-y-1">
-                <!-- Se llena con JS -->
+            <div id="lista-conceptos" class="space-y-1"></div>
+
+            <div class="total-box mt-6">
+                <p class="text-[9px] uppercase tracking-[0.4em] text-gray-400 mb-3">Inversión Total Estimada</p>
+                <div id="total-monto" class="text-4xl font-light gold-text tracking-tighter mb-3"></div>
+                <p class="text-[8px] uppercase tracking-widest text-gray-500">Mano de obra y suministros incluidos</p>
             </div>
 
-            <!-- Caja de Total Crucial -->
-            <div class="total-box">
-                <p class="text-[10px] uppercase tracking-[0.5em] text-gray-400 mb-4">Inversión Total Estimada</p>
-                <div id="total-monto" class="text-5xl font-light gold-text tracking-tighter mb-4"></div>
-                <p class="text-[9px] uppercase tracking-widest text-gray-500">Mano de obra y suministros de alta gama incluidos</p>
-            </div>
-
-            <div class="mt-12 text-[9px] text-gray-400 text-center uppercase tracking-[0.2em] leading-relaxed border-t pt-10">
-                <p class="mb-3">Vigencia: Mayo 2026 · Puebla, México</p>
-                <p class="font-bold text-gray-700">Ejecución técnica bajo estándares de Arquitectura de Autor.</p>
-                <p class="font-bold gold-text mt-2">Nota: No incluye trámites municipales, licencias ni cuotas patronales.</p>
-            </div>
-
-            <div class="mt-12 flex flex-col gap-4 no-print">
-                <button onclick="descargarPDF()" class="w-full bg-black text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:shadow-xl">
-                    Descargar Presupuesto en PDF
-                </button>
-                <button onclick="location.reload()" class="text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">
-                    ← Volver a Editar
-                </button>
+            <div class="mt-8 text-[8px] text-gray-400 text-center uppercase tracking-[0.15em] leading-relaxed border-t pt-6">
+                <p class="mb-2">Vigencia: Mayo 2026 · Puebla, México</p>
+                <p class="font-bold text-gray-700">Arquitectura de Autor / David Lindoro Juárez</p>
+                <p class="font-bold gold-text mt-1">Excluye: Licencias, trámites y cuotas IMSS.</p>
             </div>
         </div>
     </div>
 
+    <!-- Botones de Acción (Fuera del área de captura) -->
+    <div id="controles" class="max-w-[600px] mx-auto mt-6 hidden flex flex-col gap-3">
+        <button onclick="descargarImagen()" class="w-full bg-[#b8926a] text-white py-4 text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-black transition-all">
+            Descargar Presupuesto (Imagen PNG)
+        </button>
+        <button onclick="location.reload()" class="w-full bg-white text-gray-400 py-3 text-[9px] font-bold uppercase tracking-widest border border-gray-100">
+            Nuevo Cálculo
+        </button>
+    </div>
+
     <script>
-        const formatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        const format = (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
 
-        const conceptos = [
-            { t: "01. Preliminares y Cimentación", d: "Limpieza del terreno, trazo, excavación y sistema estructural de desplante." },
-            { t: "02. Estructura de Obra Gris", d: "Muros de carga, columnas, vigas de refuerzo y losas de entrepiso." },
-            { t: "03. Instalaciones Especializadas", d: "Ingeniería hidráulica, sanitaria y eléctrica oculta con pruebas de presión." },
-            { t: "04. Acabados y Recubrimientos", d: "Aplanados de alta calidad, yeso fino, pisos cerámicos y detalles estéticos." },
-            { t: "05. Cancelería y Herrería", d: "Suministro e instalación de ventanería y elementos metálicos de protección." }
-        ];
-
-        function generarPresupuesto() {
+        function generar() {
             const m2C = parseFloat(document.getElementById('m2-input').value) || 0;
             const m2R = parseFloat(document.getElementById('roof-input').value) || 0;
 
-            if (m2C <= 0 && m2R <= 0) return alert("Por favor, ingresa los metros cuadrados.");
+            if (m2C <= 0 && m2R <= 0) return alert("Ingresa metros cuadrados.");
 
-            const totalInversion = (m2C * 12500) + (m2R * 6500);
+            const total = (m2C * 12500) + (m2R * 6500);
 
-            // Poblar Datos
-            document.getElementById('label-detalle').innerText = `${m2C} M² Construcción | ${m2R} M² Roof Garden`;
-            document.getElementById('total-monto').innerText = formatter.format(totalInversion);
+            document.getElementById('resumen-texto').innerText = `${m2C}m² Cubiertos | ${m2R}m² Roof`;
+            document.getElementById('total-monto').innerText = format(total);
+
+            const conceptos = [
+                {t:"01. Preliminares y Cimentación", d:"Limpieza, trazo y desplante estructural."},
+                {t:"02. Obra Gris y Estructura", d:"Muros, columnas y losas reforzadas."},
+                {t:"03. Instalaciones Hidro-Eléctricas", d:"Redes técnicas y sanitarias de alta eficiencia."},
+                {t:"04. Acabados y Revestimientos", d:"Pisos cerámicos, yeso fino y detalles estéticos."},
+                {t:"05. Cancelería de Aluminio", d:"Suministro de ventanería técnica."}
+            ];
 
             let html = "";
             conceptos.forEach(c => {
-                html += `
-                    <div class="line-separator">
-                        <h3 class="text-[11px] font-bold text-gray-800 uppercase tracking-widest mb-1">${c.t}</h3>
-                        <p class="text-[10px] text-gray-400 leading-tight uppercase font-medium">${c.d}</p>
-                    </div>
-                `;
+                html += `<div class="line-separator">
+                    <h3 class="text-[10px] font-bold text-gray-800 uppercase tracking-widest mb-1">${c.t}</h3>
+                    <p class="text-[9px] text-gray-400 uppercase leading-tight">${c.d}</p>
+                </div>`;
             });
-            document.getElementById('lista-fases').innerHTML = html;
 
-            // Cambiar pantalla
+            document.getElementById('lista-conceptos').innerHTML = html;
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
+            document.getElementById('controles').classList.remove('hidden');
         }
 
-        function descargarPDF() {
-            const element = document.getElementById('area-pdf');
-            const noPrint = document.querySelectorAll('.no-print');
+        function descargarImagen() {
+            const area = document.getElementById('capture-area');
             
-            // Ocultar botones antes de capturar
-            noPrint.forEach(el => el.style.display = 'none');
-
-            const opt = {
-                margin: 0,
-                filename: 'Presupuesto_David_Lindoro.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { 
-                    scale: 3, 
-                    useCORS: true,
-                    letterRendering: true,
-                    scrollY: 0
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Pequeño timeout para asegurar que el DOM esté listo
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    noPrint.forEach(el => el.style.display = 'flex');
-                });
-            }, 500);
+            html2canvas(area, {
+                scale: 3, // Calidad super alta
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Presupuesto_David_Lindoro.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
         }
     </script>
 </body>
