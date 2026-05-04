@@ -15,8 +15,6 @@
         .gold-text { color: var(--gold-primary); }
         h1, h2 { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.6s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         input { 
             background: transparent; 
@@ -27,13 +25,16 @@
         }
         input:focus { border-bottom: 1px solid var(--gold-primary); }
 
-        /* Estilo específico para asegurar visibilidad en PDF */
-        .pdf-total-box { background-color: #18181b !important; color: white !important; -webkit-print-color-adjust: exact; }
+        /* Forzar visibilidad en impresión/PDF */
+        @media print {
+            .no-print { display: none !important; }
+            .pdf-total-box { background-color: #1a1a1a !important; color: #b8926a !important; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
 
-    <div id="area-pdf" class="w-full max-w-2xl lux-card shadow-2xl p-8 md:p-14 transition-all fade-in">
+    <div id="area-pdf" class="w-full max-w-2xl lux-card shadow-2xl p-8 md:p-14 transition-all">
         
         <header class="text-center border-b pb-8 mb-10">
             <h1 class="text-2xl font-bold uppercase gold-text tracking-[0.3em]">David Lindoro</h1>
@@ -61,31 +62,31 @@
         </div>
 
         <!-- Pantalla de Resultados -->
-        <div id="pantalla-dos" class="hidden fade-in">
+        <div id="pantalla-dos" class="hidden">
             <div class="mb-6 flex justify-between items-center border-b pb-2">
-                <span id="resumen-m2" class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Desglose de Superficie</span>
+                <span id="resumen-m2" class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Desglose</span>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-[#b8926a]">Calidad: Semi Residencial</span>
             </div>
 
             <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases"></div>
 
-            <div class="pdf-total-box p-8 text-center rounded-sm shadow-xl">
+            <div class="bg-zinc-900 p-8 text-center rounded-sm shadow-xl" style="background-color: #1a1a1a;">
                 <p class="text-[9px] text-gray-400 uppercase tracking-[0.5em] mb-4">Inversión Total de Ejecución</p>
                 <p id="total-final" class="text-4xl gold-text font-light tracking-tighter"></p>
-                <p class="text-[8px] text-zinc-400 uppercase mt-4 tracking-widest leading-relaxed">
+                <p class="text-[8px] text-zinc-500 uppercase mt-4 tracking-widest">
                     Mano de obra y suministros incluidos.
                 </p>
             </div>
 
             <div class="mt-10 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-8">
                 <p class="mb-2">Vigencia: Mayo 2026 · Puebla, México</p>
-                <p class="font-bold text-gray-600">Materiales de gama media-alta y ejecución técnica especializada.</p>
-                <p class="font-bold text-[#b8926a]">EXCLUYE: TRAMITOLOGÍA, LICENCIAS, DERECHOS MUNICIPALES Y CUOTAS IMSS.</p>
+                <p class="font-bold text-gray-600 uppercase">Materiales de gama media-alta y ejecución técnica especializada.</p>
+                <p class="font-bold text-[#b8926a] uppercase">Excluye: Tramitología, licencias, derechos municipales y cuotas IMSS.</p>
             </div>
 
             <div id="botones-accion" class="mt-10 flex flex-col gap-3 no-print">
                 <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Descargar PDF Oficial</button>
-                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">Realizar nuevo cálculo</button>
+                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">Nuevo cálculo</button>
             </div>
         </div>
     </div>
@@ -96,21 +97,20 @@
         const fases = [
             { t: "Preliminares y Cimentación", d: "Limpieza, trazo, excavación y cimentación estructural." },
             { t: "Estructura de Obra Gris", d: "Muros de carga, vigas, columnas y losas reforzadas." },
-            { t: "Instalaciones y Drenajes", d: "Redes hidráulicas, eléctricas y sanitarias integrales." },
-            { t: "Recubrimientos y Acabados", d: "Aplanados, yeso, pisos cerámicos y detalles en muros." },
-            { t: "Herrerías y Aluminio", d: "Suministro e instalación de ventanería de aluminio estándar y herrería técnica." }
+            { t: "Instalaciones y Drenajes", d: "Redes hidráulicas, eléctricas y sanitarias." },
+            { t: "Recubrimientos y Acabados", d: "Aplanados, yeso, pisos cerámicos y detalles finos." },
+            { t: "Herrerías y Aluminio", d: "Ventanería de aluminio y herrería técnica especializada." }
         ];
 
         function generar() {
             const m2Construccion = parseFloat(document.getElementById('m2-input').value) || 0;
             const m2Roof = parseFloat(document.getElementById('roof-input').value) || 0;
 
-            if (m2Construccion <= 0 && m2Roof <= 0) return alert("Por favor, ingresa una superficie válida.");
+            if (m2Construccion <= 0 && m2Roof <= 0) return alert("Ingresa valores válidos.");
 
             const total = (m2Construccion * 12500) + (m2Roof * 6500);
             
-            // Llenar datos antes de mostrar
-            document.getElementById('resumen-m2').innerText = `${m2Construccion}m² Cubiertos | ${m2Roof}m² Roof Garden`;
+            document.getElementById('resumen-m2').innerText = `${m2Construccion}m² CUBIERTOS | ${m2Roof}m² ROOF GARDEN`;
             document.getElementById('total-final').innerText = moneda(total);
 
             let html = "";
@@ -118,7 +118,7 @@
                 html += `
                     <div class="border-b border-gray-100 pb-3">
                         <h3 class="text-[10px] font-bold text-gray-800 uppercase tracking-widest mb-1">${f.t}</h3>
-                        <p class="text-[9px] text-gray-400 leading-tight uppercase tracking-tighter">${f.d}</p>
+                        <p class="text-[9px] text-gray-400 leading-tight uppercase">${f.d}</p>
                     </div>
                 `;
             });
@@ -128,29 +128,34 @@
             document.getElementById('pantalla-dos').classList.remove('hidden');
         }
 
-        function exportar() {
-            const el = document.getElementById('area-pdf');
+        async function exportar() {
+            const element = document.getElementById('area-pdf');
             const botones = document.getElementById('botones-accion');
             
-            // Ocultar botones manualmente para que no salgan en el PDF
+            // Ocultamos botones
             botones.style.display = 'none';
 
-            const opciones = {
-                margin: 10,
-                filename: 'Cotizacion_Arq_Lindoro.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
+            const opt = {
+                margin: [10, 10],
+                filename: 'Cotizacion_Lindoro.pdf',
+                image: { type: 'jpeg', quality: 1 },
                 html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
+                    scale: 3, 
+                    useCORS: true, 
+                    logging: false,
                     letterRendering: true
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opciones).from(el).save().then(() => {
-                // Volver a mostrar los botones tras la descarga
+            // Ejecución con promesa para asegurar el renderizado
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error("Error al generar PDF:", error);
+            } finally {
                 botones.style.display = 'flex';
-            });
+            }
         }
     </script>
 </body>
