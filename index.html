@@ -9,34 +9,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap');
         
-        :root {
-            --gold-primary: #b8926a;
-            --dark-bg: #0d0d0d;
-        }
-
-        body { 
-            background-color: var(--dark-bg); 
-            font-family: 'Montserrat', sans-serif; 
-            color: #333; 
-        }
-
-        .lux-card { 
-            background: #fff; 
-            border-top: 8px solid var(--gold-primary); 
-        }
-
+        :root { --gold-primary: #b8926a; --dark-bg: #0d0d0d; }
+        body { background-color: var(--dark-bg); font-family: 'Montserrat', sans-serif; color: #333; }
+        .lux-card { background: #fff; border-top: 8px solid var(--gold-primary); }
         .gold-text { color: var(--gold-primary); }
         h1, h2 { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-in;
+        .fade-in { animation: fadeIn 0.6s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        select, input { 
+            background: transparent; 
+            border-bottom: 1px solid #eee; 
+            outline: none; 
+            transition: all 0.3s;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        select:focus, input:focus { border-bottom: 1px solid var(--gold-primary); }
     </style>
 </head>
 <body class="p-4 md:p-10 flex justify-center items-start min-h-screen">
@@ -49,76 +37,99 @@
             <div class="w-12 h-0.5 bg-[#b8926a] mx-auto mt-6"></div>
         </header>
 
-        <div id="pantalla-uno" class="max-w-xs mx-auto py-12 space-y-8">
-            <div class="text-center">
-                <p class="text-[10px] font-bold text-[#b8926a] uppercase tracking-[0.2em] mb-2">Estándar Semi Residencial</p>
-                <label class="block text-[10px] font-bold uppercase mb-4 tracking-widest text-gray-400 text-center">Metros Cuadrados a Construir:</label>
-                <input type="number" id="m2-input" placeholder="0.00" class="w-full p-2 border-b border-gray-100 outline-none text-4xl text-center focus:border-[#b8926a] transition-all bg-transparent font-light" step="0.01">
+        <!-- Pantalla de Configuración -->
+        <div id="pantalla-uno" class="max-w-xs mx-auto py-8 space-y-10">
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400">Extensión de Obra (m²):</label>
+                    <input type="number" id="m2-input" placeholder="0.00" class="w-full p-2 text-3xl text-center font-light">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase mb-2 tracking-widest text-gray-400">Número de Recámaras:</label>
+                    <select id="recamaras-input" class="w-full p-2 text-xl text-center font-light appearance-none cursor-pointer">
+                        <!-- Generado por JS del 1 al 10 -->
+                    </select>
+                </div>
             </div>
+
             <button onclick="generar()" class="w-full bg-black text-white py-5 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#b8926a] transition-all">
-                Calcular Propuesta Técnica
+                Generar Propuesta Técnica
             </button>
         </div>
 
+        <!-- Pantalla de Resultados -->
         <div id="pantalla-dos" class="hidden fade-in">
             <div class="mb-6 flex justify-between items-center border-b pb-2">
-                <span class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Alcance de la Partida</span>
+                <span id="resumen-config" class="text-[9px] font-bold uppercase tracking-widest text-gray-400">Cargando...</span>
                 <span class="text-[9px] font-bold uppercase tracking-widest text-[#b8926a]">Calidad: Semi Residencial</span>
             </div>
 
-            <!-- Listado sin costos individuales -->
-            <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases">
-                <!-- Se llena con JS -->
-            </div>
+            <div class="grid grid-cols-1 gap-5 mb-10" id="lista-fases"></div>
 
             <div class="bg-zinc-900 p-8 text-center rounded-sm shadow-xl">
                 <p class="text-[9px] text-gray-500 uppercase tracking-[0.5em] mb-4">Inversión Total de Ejecución</p>
                 <p id="total-final" class="text-4xl gold-text font-light tracking-tighter"></p>
                 <p class="text-[8px] text-zinc-500 uppercase mt-4 tracking-widest leading-relaxed">
-                    Costo integral: $12,500.00 MXN / m² <br>
-                    Incluye honorarios profesionales (20%).
+                    Estimación paramétrica basada en complejidad arquitectónica. <br>
+                    Mano de obra y suministros incluidos.
                 </p>
             </div>
 
             <div class="mt-10 text-[8px] text-gray-400 text-center uppercase tracking-[0.2em] leading-loose border-t pt-8">
                 <p class="mb-2">Vigencia: Mayo 2026 · Puebla, México</p>
-                <p class="font-bold text-gray-600">Materiales de gama media-alta y mano de obra calificada.</p>
+                <p class="font-bold text-gray-600">Materiales de gama media-alta y ejecución técnica especializada.</p>
                 <p class="font-bold text-[#b8926a]">EXCLUYE: TRAMITOLOGÍA, LICENCIAS, DERECHOS MUNICIPALES Y CUOTAS IMSS.</p>
             </div>
 
             <div class="mt-10 flex flex-col gap-3 no-print">
-                <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">
-                    Descargar PDF Oficial
-                </button>
-                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">
-                    Realizar nuevo cálculo
-                </button>
+                <button onclick="exportar()" class="w-full bg-black text-white py-4 text-[10px] font-bold uppercase tracking-widest hover:bg-[#b8926a] transition-all">Descargar PDF Oficial</button>
+                <button onclick="location.reload()" class="w-full text-[9px] text-gray-400 uppercase font-bold tracking-widest py-2">Nuevo cálculo</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Llenar el select de recámaras
+        const selectRec = document.getElementById('recamaras-input');
+        for(let i=1; i<=10; i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = i + (i === 1 ? ' Recámara' : ' Recámaras');
+            if(i === 3) opt.selected = true;
+            selectRec.appendChild(opt);
+        }
+
         const moneda = (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
 
         const fases = [
-            { t: "Preliminares y Cimentación", d: "Limpieza, trazo, excavación y cimentación estructural.", p: 2500 },
-            { t: "Estructura de Obra Gris", d: "Muros de carga, vigas, columnas y losas reforzadas.", p: 3500 },
-            { t: "Instalaciones y Drenajes", d: "Redes hidráulicas, eléctricas y sanitarias integrales.", p: 1800 },
-            { t: "Recubrimientos y Acabados", d: "Aplanados, yeso, pisos cerámicos y detalles en muros.", p: 1600 },
-            { t: "Carpintería y Herrería", d: "Puertas de acceso e intercomunicación, y ventanería de aluminio estándar.", p: 1016.67 }
+            { t: "Preliminares y Cimentación", d: "Limpieza, trazo, excavación y cimentación estructural." },
+            { t: "Estructura de Obra Gris", d: "Muros de carga, vigas, columnas y losas reforzadas." },
+            { t: "Instalaciones y Drenajes", d: "Redes hidráulicas, eléctricas y sanitarias integrales." },
+            { t: "Recubrimientos y Acabados", d: "Aplanados, yeso, pisos cerámicos y detalles en muros." },
+            { t: "Herrerías y Aluminio", d: "Suministro e instalación de ventanería de aluminio estándar y herrería técnica." }
         ];
 
         function generar() {
             const m = parseFloat(document.getElementById('m2-input').value);
+            const r = parseInt(document.getElementById('recamaras-input').value);
+            
             if (!m || m <= 0) return alert("Por favor, ingresa los metros cuadrados.");
 
-            let html = "";
-            let subtotalBase = 0;
+            // LÓGICA DE COSTO:
+            // Base: $12,500. 
+            // Si tiene más de 3 recámaras, sube 3% por cada recámara extra (más muros e instalaciones).
+            // Si tiene menos de 3, baja un 2% por simplicidad.
+            let factorComplejidad = 1;
+            if (r > 3) factorComplejidad = 1 + ((r - 3) * 0.03);
+            if (r < 3) factorComplejidad = 1 - ((3 - r) * 0.02);
 
+            const costoFinalM2 = 12500 * factorComplejidad;
+            
+            document.getElementById('resumen-config').innerText = `${m} m² / ${r} Recámaras`;
+
+            let html = "";
             fases.forEach(f => {
-                subtotalBase += (m * f.p);
-                
-                // Generamos solo el nombre y la descripción sin el precio lateral
                 html += `
                     <div class="border-b border-gray-50 pb-3">
                         <h3 class="text-[10px] font-bold text-gray-800 uppercase tracking-widest mb-1">${f.t}</h3>
@@ -128,7 +139,7 @@
             });
 
             document.getElementById('lista-fases').innerHTML = html;
-            document.getElementById('total-final').innerText = moneda(subtotalBase * 1.20);
+            document.getElementById('total-final').innerText = moneda(m * costoFinalM2);
             
             document.getElementById('pantalla-uno').classList.add('hidden');
             document.getElementById('pantalla-dos').classList.remove('hidden');
@@ -139,15 +150,13 @@
             const botones = document.querySelectorAll('.no-print');
             botones.forEach(b => b.classList.add('hidden'));
 
-            const opciones = {
+            html2pdf().set({
                 margin: 10,
-                filename: 'Propuesta_Ejecucion_Lindoro.pdf',
+                filename: 'Propuesta_Lindoro_Personalizada.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opciones).from(el).save().then(() => {
+            }).from(el).save().then(() => {
                 botones.forEach(b => b.classList.remove('hidden'));
             });
         }
